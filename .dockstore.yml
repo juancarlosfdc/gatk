@@ -107,6 +107,7 @@ workflows:
        branches:
          - master
          - ah_var_store
+         - ah_update_extract
          - rsa_rescattering_wf
    - name: GvsImportGenomes
      subclass: WDL
