@@ -11,6 +11,8 @@ public final class CopyNumberStandardArgument {
 
     public static final String DENOISED_COPY_RATIOS_FILE_LONG_NAME = "denoised-copy-ratios";
 
+    public static final String PREDETERMINED_SEGMENTATION_FILE_LONG_NAME = "predetermined_segmentation";
+    
     public static final String ALLELIC_COUNTS_FILE_LONG_NAME = "allelic-counts";
 
     public static final String NORMAL_ALLELIC_COUNTS_FILE_LONG_NAME = "normal-allelic-counts";
