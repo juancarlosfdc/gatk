@@ -25,6 +25,8 @@ import org.broadinstitute.hellbender.tools.copynumber.segmentation.CopyRatioKern
 import org.broadinstitute.hellbender.tools.copynumber.segmentation.MultidimensionalKernelSegmenter;
 import org.broadinstitute.hellbender.tools.copynumber.utils.segmentation.KernelSegmenter;
 import org.broadinstitute.hellbender.utils.Utils;
+import org.broadinstitute.hellbender.engine.GATKTool;
+import org.broadinstitute.hellbender.cmdline.IntervalArgumentCollection;
 
 import java.io.File;
 import java.util.*;
@@ -278,6 +280,13 @@ public final class ModelSegments extends CommandLineProgram {
     private File inputNormalAllelicCountsFile = null;
 
     @Argument(
+            doc = "Intervals list to predetermine segmentation--if provided, ModelSegments will not do any segmentation, but make copy ratio and allelic imbalance calls within the provided segments.",
+            fullName = CopyNumberStandardArgument.PREDETERMINED_SEGMENTATION_FILE_LONG_NAME,
+            optional = true
+    )
+    private File predeterminedSegmentation = null;
+
+    @Argument(
             doc = "Prefix for output filenames.",
             fullName =  CopyNumberStandardArgument.OUTPUT_PREFIX_LONG_NAME
     )
@@ -473,19 +482,29 @@ public final class ModelSegments extends CommandLineProgram {
     )
     private int numSmoothingIterationsPerFit = 0;
 
+    private List<SimpleInterval> intervals;
+
     @Override
     protected Object doWork() {
         validateArguments();
+
+	final SAMSequenceDictionary sequenceDictionary = getBestAvailableSequenceDictionary(); // this is in hellbender/engine/GATKtool.java
 
         //read input files (return null if not available) and validate metadata
         CopyRatioCollection denoisedCopyRatios = readOptionalFileOrNull(inputDenoisedCopyRatiosFile, CopyRatioCollection::new);
         final AllelicCountCollection allelicCounts = readOptionalFileOrNull(inputAllelicCountsFile, AllelicCountCollection::new);
         final AllelicCountCollection normalAllelicCounts = readOptionalFileOrNull(inputNormalAllelicCountsFile, AllelicCountCollection::new);
         final SampleLocatableMetadata metadata = getValidatedMetadata(denoisedCopyRatios, allelicCounts);
-
         //genotype hets (return empty collection containing only metadata if no allelic counts available)
         final AllelicCountCollection hetAllelicCounts = genotypeHets(metadata, denoisedCopyRatios, allelicCounts, normalAllelicCounts);
+	final List<SimpleInterval> inputIntervals = hasUserSuppliedIntervals() // imported
+	    ? intervalArgumentCollection.getIntervals(sequenceDictionary) // not sure--hellbender/cmdline/intervalArgumentCollection isn't imported in preprocessIntervals
+	    : null; // if no file was input, set inputIntervals to null.
 
+	final IntervalList paddedIntervalList = padIntervals(inputIntervals, 0, sequenceDictionary);
+
+	paddedIntervalList.write(predeterminedSegmentation);
+	
         //if denoised copy ratios are still null at this point, we assign an empty collection containing only metadata
         if (denoisedCopyRatios == null) {
             denoisedCopyRatios = new CopyRatioCollection(metadata, Collections.emptyList());
