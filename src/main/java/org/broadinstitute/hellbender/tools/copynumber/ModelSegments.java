@@ -516,7 +516,7 @@ public final class ModelSegments extends CommandLineProgram {
                             ImmutableSet.copyOf(windowSizes).asList(),
                             numChangepointsPenaltyFactor, numChangepointsPenaltyFactor);
         }
-
+	writeSegments(multidimensionalSegments, "_md_segs");
         logger.info("Modeling available denoised copy ratios and heterozygous allelic counts...");
         //initial MCMC model fitting performed by MultidimensionalModeller constructor
         final AlleleFractionPrior alleleFractionPrior = new AlleleFractionPrior(minorAlleleFractionPriorAlpha);
