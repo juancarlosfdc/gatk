@@ -282,6 +282,22 @@ public final class ModelSegments extends CommandLineProgram {
     private File inputDenoisedCopyRatiosFile = null;
 
     @Argument(
+            doc = "Intervals file going in.",
+            fullName = StandardArgumentDefinitions.INTERVALS_LONG_NAME,
+            shortName = StandardArgumentDefinitions.INTERVALS_SHORT_NAME,
+	    optional = true
+    )
+    private File outputPreprocessedIntervalsFile = null;
+
+    @Argument(
+	      doc = "Reference dictionary for preprocessing intervals.",
+	      fullName = StandardArgumentDefinitions.REFERENCE_LONG_NAME,
+	      shortName = StandardArgumentDefinitions.REFERENCE_SHORT_NAME,
+	      optional = false
+    )
+    private File referenceDictionary = null;
+    
+    @Argument(
             doc = "Input file containing allelic counts (output of CollectAllelicCounts).",
             fullName = CopyNumberStandardArgument.ALLELIC_COUNTS_FILE_LONG_NAME,
             optional = true
@@ -296,7 +312,7 @@ public final class ModelSegments extends CommandLineProgram {
     private File inputNormalAllelicCountsFile = null;
 
     @Argument(
-            doc = "Intervals list to predetermine segmentation--if provided, ModelSegments will not do any segmentation, but make copy ratio and allelic imbalance calls within the provided segments.",
+            doc = "Intervals file going out (to be written to).",
             fullName = CopyNumberStandardArgument.PREDETERMINED_SEGMENTATION_FILE_LONG_NAME,
             optional = true
     )
@@ -522,6 +538,8 @@ public final class ModelSegments extends CommandLineProgram {
 	
 	// 	paddedIntervalList.write(predeterminedSegmentation);
 	final IntervalList input_intervals = intervals.getIntervals();
+	
+	input_intervals.write(predeterminedSegmentation);
         //if denoised copy ratios are still null at this point, we assign an empty collection containing only metadata
         if (denoisedCopyRatios == null) {
             denoisedCopyRatios = new CopyRatioCollection(metadata, Collections.emptyList());
@@ -553,6 +571,7 @@ public final class ModelSegments extends CommandLineProgram {
                             numChangepointsPenaltyFactor, numChangepointsPenaltyFactor);
         }
 	writeSegments(multidimensionalSegments, "_md_segs");
+	
         logger.info("Modeling available denoised copy ratios and heterozygous allelic counts...");
         //initial MCMC model fitting performed by MultidimensionalModeller constructor
         final AlleleFractionPrior alleleFractionPrior = new AlleleFractionPrior(minorAlleleFractionPriorAlpha);
