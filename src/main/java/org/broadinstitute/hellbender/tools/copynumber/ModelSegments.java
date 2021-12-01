@@ -26,8 +26,24 @@ import org.broadinstitute.hellbender.tools.copynumber.segmentation.Multidimensio
 import org.broadinstitute.hellbender.tools.copynumber.utils.segmentation.KernelSegmenter;
 import org.broadinstitute.hellbender.utils.Utils;
 import org.broadinstitute.hellbender.engine.GATKTool;
-import org.broadinstitute.hellbender.cmdline.IntervalArgumentCollection;
+import org.broadinstitute.hellbender.cmdline.argumentcollections.IntervalArgumentCollection;
+import org.broadinstitute.hellbender.engine.spark.GATKSparkTool;
+import org.broadinstitute.hellbender.engine.AbstractConcordanceWalker;
+import htsjdk.samtools.SAMSequenceDictionary;
+import htsjdk.samtools.util.Interval;
+import htsjdk.samtools.util.IntervalList;
+import org.apache.commons.math3.util.FastMath;
+import org.broadinstitute.barclay.argparser.Argument;
+import org.broadinstitute.barclay.argparser.CommandLineProgramProperties;
+import org.broadinstitute.barclay.help.DocumentedFeature;
+import org.broadinstitute.hellbender.cmdline.StandardArgumentDefinitions;
+import org.broadinstitute.hellbender.engine.GATKTool;
+import org.broadinstitute.hellbender.engine.ReferenceDataSource;
+import org.broadinstitute.hellbender.tools.copynumber.arguments.CopyNumberArgumentValidationUtils;
+import org.broadinstitute.hellbender.utils.*;
+import picard.cmdline.programgroups.IntervalsManipulationProgramGroup;
 
+import java.util.List;
 import java.io.File;
 import java.util.*;
 import java.util.function.Function;
@@ -487,24 +503,25 @@ public final class ModelSegments extends CommandLineProgram {
     @Override
     protected Object doWork() {
         validateArguments();
-
-	final SAMSequenceDictionary sequenceDictionary = getBestAvailableSequenceDictionary(); // this is in hellbender/engine/GATKtool.java
+	PreprocessIntervals intervals = new PreprocessIntervals();
+	// 	final SAMSequenceDictionary sequenceDictionary = intervals.getBestAvailableSequenceDictionary(); // this is in hellbender/engine/GATKtool.java
 
         //read input files (return null if not available) and validate metadata
         CopyRatioCollection denoisedCopyRatios = readOptionalFileOrNull(inputDenoisedCopyRatiosFile, CopyRatioCollection::new);
         final AllelicCountCollection allelicCounts = readOptionalFileOrNull(inputAllelicCountsFile, AllelicCountCollection::new);
         final AllelicCountCollection normalAllelicCounts = readOptionalFileOrNull(inputNormalAllelicCountsFile, AllelicCountCollection::new);
         final SampleLocatableMetadata metadata = getValidatedMetadata(denoisedCopyRatios, allelicCounts);
-        //genotype hets (return empty collection containing only metadata if no allelic counts available)
-        final AllelicCountCollection hetAllelicCounts = genotypeHets(metadata, denoisedCopyRatios, allelicCounts, normalAllelicCounts);
-	final List<SimpleInterval> inputIntervals = hasUserSuppliedIntervals() // imported
-	    ? intervalArgumentCollection.getIntervals(sequenceDictionary) // not sure--hellbender/cmdline/intervalArgumentCollection isn't imported in preprocessIntervals
-	    : null; // if no file was input, set inputIntervals to null.
+	//        genotype hets (return empty collection containing only metadata if no allelic counts available)
+	final AllelicCountCollection hetAllelicCounts = genotypeHets(metadata, denoisedCopyRatios, allelicCounts, normalAllelicCounts);
+	// 	final List<SimpleInterval> inputIntervals = intervals.hasUserSuppliedIntervals() // imported
+	// 	    ? intervals.intervalArgumentCollection.getIntervals(sequenceDictionary) // not sure--hellbender/cmdline/intervalArgumentCollection isn't imported in preprocessIntervals
+	// 	    : null; // if no file was input, set inputIntervals to null.
 
-	final IntervalList paddedIntervalList = padIntervals(inputIntervals, 0, sequenceDictionary);
-
-	paddedIntervalList.write(predeterminedSegmentation);
+	// 	final IntervalList paddedIntervalList = PreprocessIntervals.padIntervals(inputIntervals, 0, sequenceDictionary);
+	// 	final IntervalList interval_list = PreprocessIntervals.onTraversalSuccess();
 	
+	// 	paddedIntervalList.write(predeterminedSegmentation);
+	final IntervalList input_intervals = intervals.getIntervals();
         //if denoised copy ratios are still null at this point, we assign an empty collection containing only metadata
         if (denoisedCopyRatios == null) {
             denoisedCopyRatios = new CopyRatioCollection(metadata, Collections.emptyList());

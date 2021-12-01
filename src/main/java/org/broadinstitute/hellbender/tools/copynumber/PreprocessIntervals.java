@@ -135,6 +135,16 @@ public final class PreprocessIntervals extends GATKTool {
     @Override
     public void traverse() {}  // no traversal for this tool
 
+    public IntervalList getIntervals(){
+	final SAMSequenceDictionary sequenceDictionary = getBestAvailableSequenceDictionary();
+
+        final List<SimpleInterval> inputIntervals = hasUserSuppliedIntervals()
+                ? intervalArgumentCollection.getIntervals(sequenceDictionary)
+                : IntervalUtils.getAllIntervalsForReference(sequenceDictionary);    // if the user didn't add any intervals,
+                                                                                    // we assume that they wanted to do whole genome sequencing
+	return padIntervals( inputIntervals, 0, sequenceDictionary); // this is a hack--we're padding with 0 to get output of type IntervalList 
+    }
+    
     @Override
     public Object onTraversalSuccess() {
         final SAMSequenceDictionary sequenceDictionary = getBestAvailableSequenceDictionary();
