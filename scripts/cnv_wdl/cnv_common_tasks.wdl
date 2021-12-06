@@ -264,7 +264,9 @@ task CollectCounts {
             exit 1
         fi
 
-        gatk --java-options "-Xmx~{command_mem_mb}m" CollectReadCounts \
+	# https://gatk.broadinstitute.org/hc/en-us/articles/360036899412-CollectFragmentCounts-BETA-
+	  
+        gatk --java-options "-Xmx~{command_mem_mb}m" CollectFragmentCounts \
             -L ~{intervals} \
             --input ~{bam} \
             --reference ~{ref_fasta} \
