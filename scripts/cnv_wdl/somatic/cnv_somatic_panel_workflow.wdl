@@ -143,7 +143,7 @@ workflow CNVSomaticPanelWorkflow {
                 format = collect_counts_format,
                 enable_indexing = false,
                 gatk4_jar_override = gatk4_jar_override,
-                gatk_docker = gatk_docker,
+                gatk_docker = "us.gcr.io/broad-gatk/gatk:4.0.0.0",
                 mem_gb = mem_gb_for_collect_counts,
                 preemptible_attempts = preemptible_attempts,
                 gcs_project_for_requester_pays = gcs_project_for_requester_pays
