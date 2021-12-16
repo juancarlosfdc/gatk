@@ -346,6 +346,7 @@ task CollectAllelicCounts {
             --input ~{bam} \
             --read-index ~{bam_idx} \
             --reference ~{ref_fasta} \
+	    --read-filter FirstOfPairReadFilter \
             --minimum-base-quality ~{default="20" minimum_base_quality} \
             --output ~{allelic_counts_filename} \
             ~{"--gcs-project-for-requester-pays " + gcs_project_for_requester_pays}
