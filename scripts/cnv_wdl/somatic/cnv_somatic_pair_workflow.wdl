@@ -275,6 +275,7 @@ workflow CNVSomaticPairWorkflow {
                 preemptible_attempts = preemptible_attempts,
                 gcs_project_for_requester_pays = gcs_project_for_requester_pays
         }
+}
 
     output {
         File preprocessed_intervals = PreprocessIntervals.preprocessed_intervals
