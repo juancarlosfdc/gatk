@@ -1,4 +1,4 @@
-# Workflow for running the GATK CNV pipeline on a matched pair. Supports both WGS and WES.
+Workflow for running the GATK CNV pipeline on a matched pair. Supports both WGS and WES.
 #
 # Notes:
 #
@@ -237,7 +237,7 @@ workflow CNVSomaticPairWorkflow {
             disk_space_gb = collect_allelic_counts_tumor_disk,
             preemptible_attempts = preemptible_attempts,
             gcs_project_for_requester_pays = gcs_project_for_requester_pays,
-            entity_id  = case_name
+            sample_id  = case_name
     }
 
 
@@ -277,7 +277,7 @@ workflow CNVSomaticPairWorkflow {
                 disk_space_gb = collect_allelic_counts_normal_disk,
                 preemptible_attempts = preemptible_attempts,
                 gcs_project_for_requester_pays = gcs_project_for_requester_pays,
-                entity_id  = control_name
+                sample_id = control_name
         }
 }
 
