@@ -307,10 +307,12 @@ task CollectAllelicCounts {
       File ref_fasta
       File ref_fasta_fai
       File ref_fasta_dict
+      String output_filename
+      
       Int? minimum_base_quality
       File? gatk4_jar_override
       String? gcs_project_for_requester_pays
-
+      
       # Runtime parameters
       String gatk_docker
       Int? mem_gb
@@ -332,10 +334,8 @@ task CollectAllelicCounts {
     Int machine_mem_mb = select_first([mem_gb, 13]) * 1000
     Int command_mem_mb = machine_mem_mb - 1000
 
-    # Sample name is derived from the bam filename
-    String base_filename = basename(bam, ".bam")
-
-    String allelic_counts_filename = "~{base_filename}.allelicCounts.tsv"
+    # in case of mismatched normals, ie bams with incorrect names, we need to get the name as input to the task
+    String allelic_counts_filename = "~{output_filename}.allelicCounts.tsv"
 
     command <<<
         set -eu
