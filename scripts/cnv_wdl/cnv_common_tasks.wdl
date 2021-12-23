@@ -307,7 +307,7 @@ task CollectAllelicCounts {
       File ref_fasta
       File ref_fasta_fai
       File ref_fasta_dict
-      String output_filename
+      String entity_id
       
       Int? minimum_base_quality
       File? gatk4_jar_override
@@ -335,7 +335,7 @@ task CollectAllelicCounts {
     Int command_mem_mb = machine_mem_mb - 1000
 
     # in case of mismatched normals, ie bams with incorrect names, we need to get the name as input to the task
-    String allelic_counts_filename = "~{output_filename}.allelicCounts.tsv"
+    String allelic_counts_filename = "~{entity_id}.allelicCounts.tsv"
 
     command <<<
         set -eu
@@ -361,7 +361,7 @@ task CollectAllelicCounts {
     }
 
     output {
-        String entity_id = base_filename
+        String entity_id = entity_id
         File allelic_counts = allelic_counts_filename
     }
 }
