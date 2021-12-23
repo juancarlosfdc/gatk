@@ -1,4 +1,4 @@
-Workflow for running the GATK CNV pipeline on a matched pair. Supports both WGS and WES.
+# Workflow for running the GATK CNV pipeline on a matched pair. Supports both WGS and WES.
 #
 # Notes:
 #
