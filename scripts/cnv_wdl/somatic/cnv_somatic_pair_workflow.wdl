@@ -237,7 +237,7 @@ workflow CNVSomaticPairWorkflow {
             disk_space_gb = collect_allelic_counts_tumor_disk,
             preemptible_attempts = preemptible_attempts,
             gcs_project_for_requester_pays = gcs_project_for_requester_pays,
-	    output_filename = case_name
+            output_filename = case_name
     }
 
 
@@ -277,7 +277,7 @@ workflow CNVSomaticPairWorkflow {
                 disk_space_gb = collect_allelic_counts_normal_disk,
                 preemptible_attempts = preemptible_attempts,
                 gcs_project_for_requester_pays = gcs_project_for_requester_pays,
-		output_filename = control_name
+                output_filename = control_name
         }
 }
 
